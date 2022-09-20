@@ -1,0 +1,75 @@
+library(readr) 
+library(ggplot2)
+library(tidyverse)
+
+
+union<- read_csv("https://uit-sok-2008-h22.github.io/Assets/union_unempl.csv")
+
+union$country <- gsub("United Kingdom", "UK", union$country)
+names(union)[names(union) == "country"] <- "region"
+
+mapdata <- map_data("world") 
+
+mapdata_full <- left_join(mapdata, union, by="region")
+
+mapdata_full<-mapdata_full %>% filter(!is.na(mapdata_full$unempl))
+
+mapdata_full$excess_coverage<-mapdata_full$coverage - mapdata_full$density 
+
+map_unempl<-ggplot(mapdata_full, aes( x = long, y = lat, group=group)) +
+  geom_polygon(aes(fill = unempl), color = "black")
+map_unempl
+
+map_unempl2 <- map_unempl + scale_fill_gradient(name = "Arbeidsledighet (%)", low = "yellow", high = "red", na.value = "grey50") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        rect = element_blank())
+map_unempl2
+
+#oppgave 2
+map_unempl3 <- ggplot(mapdata_full, aes(x = long, y = lat, group = group)) +
+  geom_polygon(aes(fill = density), col = "black")
+map_unempl3
+
+map_unempl4 <- map_unempl3 + scale_fill_gradient(name = "Fagforeningsdensitet (%)", low = "yellow", high = "red", na.value = "grey50") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        rect = element_blank())
+map_unempl4
+
+#oppgave 3
+
+map_unempl5 <- ggplot(mapdata_full, aes(x = long, y = lat, group = group)) +
+  geom_polygon(aes(fill = excess_coverage), col = "black")
+map_unempl5
+
+map_unempl6 <- map_unempl5 + scale_fill_gradient(name = "Excess Coverage", low = "pink", high = "purple", na.value = "grey50") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        rect = element_blank())
+map_unempl6
+
+map_unempl7 <- ggplot(mapdata_full, aes(x = long, y = lat, group = group)) +
+  geom_polygon(aes(fill = coord), col = "black")
+map_unempl7
+
+map_unempl8 <- map_unempl7 + scale_fill_brewer(name="kordinering av lønnsfastsettelse", palette = "Set3") +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        rect = element_blank())
+map_unempl8
+
+
+
